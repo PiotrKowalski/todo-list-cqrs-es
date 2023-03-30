@@ -6,22 +6,6 @@ import (
 	"todo-list-cqrs-es/internal/ports/api"
 )
 
-func GetUser(app api.API) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		userId := c.Param("id")
-		user, err := app.GetUser(c, userId)
-		if err != nil {
-			return
-		}
-
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.Error{Err: err, Type: gin.ErrorTypePublic})
-		}
-
-		c.JSON(http.StatusOK, gin.H{"user": user})
-	}
-}
-
 func CreateTodoList(app api.API) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var todolist api.CreateTodoListRequest

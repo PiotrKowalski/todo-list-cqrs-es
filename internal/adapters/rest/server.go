@@ -13,7 +13,6 @@ func NewRESTService(application api.API) Adapter {
 	r := gin.Default()
 
 	v1 := r.Group("/v1")
-	v1.GET("/user/:id", GetUser(application))
 	v1.POST("/todolist", CreateTodoList(application))
 	v1.GET("/todolist/:id", GetTodoList(application))
 

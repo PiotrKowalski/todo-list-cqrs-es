@@ -2,12 +2,9 @@ package app
 
 import (
 	"context"
-	"todo-list-cqrs-es/internal/adapters/repo/mock"
 	"todo-list-cqrs-es/internal/adapters/repo/mongodb"
 	cTodolist "todo-list-cqrs-es/internal/app/commands/todolist"
 	qTodolist "todo-list-cqrs-es/internal/app/queries/todolist"
-	qUser "todo-list-cqrs-es/internal/app/queries/user"
-	dUser "todo-list-cqrs-es/internal/domain/user"
 	"todo-list-cqrs-es/internal/ports/api"
 )
 
@@ -21,7 +18,6 @@ type commands struct {
 }
 
 type queries struct {
-	GetUserHandler     qUser.GetUserHandler
 	GetTodoListHandler qTodolist.GetTodoListHandler
 }
 
@@ -31,28 +27,15 @@ type Config struct {
 
 func NewApplication(config Config) *Application {
 	todoListAdapter := mongodb.NewTodoListRepoAdapter(config.MongoDBURI)
-	userRepo := mock.NewUserRepoAdapter()
 
 	return &Application{
 		Commands: commands{
 			CreateTodoListHandler: cTodolist.NewCreateTodoListHandler(todoListAdapter),
 		},
 		Queries: queries{
-			GetUserHandler:     qUser.NewGetUserHandler(userRepo),
 			GetTodoListHandler: qTodolist.NewGetTodoListHandler(todoListAdapter),
 		},
 	}
-}
-
-func (a Application) GetUser(ctx context.Context, id string) (*dUser.User, error) {
-	q := qUser.Get{Id: id}
-
-	user, err := a.Queries.GetUserHandler.Handle(ctx, q)
-	if err != nil {
-		return nil, nil
-	}
-
-	return user, nil
 }
 
 func (a Application) CreateTodoList(ctx context.Context, list api.CreateTodoListRequest) (*api.TodoListResponse, error) {
